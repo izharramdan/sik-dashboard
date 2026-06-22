@@ -1,18 +1,24 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
+import LinkComponent from "next/link";
 import { cn } from "@/lib/utils";
 import {
   BarChart3,
-  Database,
-  ArrowRightLeft,
   FileText,
-  Settings,
   ChevronLeft,
   ChevronRight,
-  Monitor
+  Monitor,
+  ShieldCheck,
+  QrCode,
+  FileSpreadsheet,
+  Building2,
+  AlertTriangle,
+  Wrench,
+  UserCheck,
+  Award,
+  Users,
 } from "lucide-react";
 import {
   Tooltip,
@@ -29,146 +35,230 @@ type SidebarProps = {
 
 export function Sidebar({ className, collapsed, onToggle }: SidebarProps) {
   const pathname = usePathname();
+  const [userRoles, setUserRoles] = useState<string[]>([]);
 
-  const mainItems = [
-    { title: "Dashboard", href: "/dashboard", icon: BarChart3 },
-    { title: "Data Master", href: "/dashboard/master", icon: Database },
-    { title: "Transaksi", href: "/dashboard/transaction", icon: ArrowRightLeft },
-    { title: "Laporan", href: "/dashboard/report", icon: FileText },
-    { title: "Pengaturan", href: "/dashboard/setting", icon: Settings },
-  ];
+  useEffect(() => {
+    const roles = JSON.parse(localStorage.getItem("user_roles") || "[]");
+    setUserRoles(roles);
+  }, []);
 
-  const renderNavItem = (
-    item: {
-      title: string;
-      href: string;
-      icon: any;
-    },
-    key?: string
-  ) => {
-    const active = pathname === item.href || (pathname.startsWith(item.href) && item.href !== "/dashboard");
+  const getNavGroups = () => {
+    const isSecurity =
+      userRoles.includes("SECURITY") || userRoles.includes("ROLE_SECURITY");
+
+    if (isSecurity) {
+      return [
+        {
+          groupTitle: "Security Navigation",
+          items: [
+            {
+              title: "Scan Gate Pos",
+              href: "/dashboard/security/gate",
+              icon: QrCode,
+            },
+            {
+              title: "Live Monitoring Hari Ini",
+              href: "/dashboard/security/monitoring",
+              icon: Monitor,
+            },
+          ],
+        },
+      ];
+    }
+
+    return [
+      {
+        groupTitle: "Core Safety & Permits",
+        items: [
+          {
+            title: "Dashboard Analitik K3",
+            href: "/dashboard/safety/analytics",
+            icon: BarChart3,
+          },
+          {
+            title: "Manajemen SIK",
+            href: "/dashboard/safety/sik",
+            icon: FileText,
+          },
+          {
+            title: "Eksekusi Denwacho",
+            href: "/dashboard/safety/denwacho",
+            icon: ShieldCheck,
+          },
+          {
+            title: "Temuan Safety (Findings)",
+            href: "/dashboard/safety/findings",
+            icon: AlertTriangle,
+          },
+        ],
+      },
+      {
+        groupTitle: "Resource & Qualifications",
+        items: [
+          {
+            title: "Manage Users & Otoritas",
+            href: "/dashboard/safety/users",
+            icon: Users,
+          },
+          {
+            title: "Master Tools & APD",
+            href: "/dashboard/safety/tools-apd",
+            icon: Wrench,
+          },
+          {
+            title: "Anzen Leader Data",
+            href: "/dashboard/safety/anzen-leaders",
+            icon: UserCheck,
+          },
+          {
+            title: "Special Skill Certs",
+            href: "/dashboard/safety/special-skills",
+            icon: Award,
+          },
+        ],
+      },
+      {
+        groupTitle: "Reporting",
+        items: [
+          {
+            title: "Laporan K3 (Excel/PDF)",
+            href: "/dashboard/safety/reports",
+            icon: FileSpreadsheet,
+          },
+        ],
+      },
+    ];
+  };
+
+  const navGroups = getNavGroups();
+
+  const renderNavItem = (item: { title: string; href: string; icon: any }) => {
+    const active =
+      pathname === item.href ||
+      (pathname.startsWith(item.href) && item.href !== "/dashboard");
     const Icon = item.icon;
 
     const content = (
-      <Link
-        key={key ?? item.href}
+      <LinkComponent
+        key={item.title}
         href={item.href}
         className={cn(
-          "group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all",
-          "hover:bg-slate-800/75 hover:shadow-[0_0_0_1px_rgba(148,163,184,0.35)]",
+          "group relative flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-xs font-medium transition-all duration-200 outline-none",
           active
-            ? "bg-slate-900 text-slate-50 shadow-[0_18px_45px_rgba(0,0,0,0.9)]"
-            : "text-slate-300/80"
+            ? "bg-indigo-600/10 text-indigo-500 dark:text-indigo-400 border border-indigo-500/20"
+            : "text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900/50 hover:text-slate-900 dark:hover:text-slate-200 border border-transparent",
         )}
       >
         {active && (
-          <span className="absolute -left-1 top-1 bottom-1 w-1 rounded-full bg-gradient-to-b from-sky-400 via-blue-500 to-cyan-300 shadow-[0_0_18px_rgba(56,189,248,0.9)]" />
+          <span className="absolute left-0 top-1/4 h-1/2 w-[3px] rounded-r-full bg-indigo-500" />
         )}
+
         <Icon
           className={cn(
-            "h-5 w-5 flex-none transition-all",
+            "h-4 w-4 shrink-0 transition-colors",
             active
-              ? "text-sky-300"
-              : "text-slate-400 group-hover:text-slate-100 group-hover:scale-[1.02]"
+              ? "text-indigo-500 dark:text-indigo-400"
+              : "text-slate-400 dark:text-slate-500 group-hover:text-slate-900 dark:group-hover:text-slate-200",
           )}
         />
-        {!collapsed && (
-          <span
-            className={cn(
-              "truncate transition-colors",
-              active ? "text-slate-50" : "group-hover:text-slate-100"
-            )}
-          >
-            {item.title}
-          </span>
-        )}
-      </Link>
+        {!collapsed && <span className="truncate">{item.title}</span>}
+      </LinkComponent>
     );
 
-    if (!collapsed) return content;
+    if (collapsed) {
+      return (
+        <TooltipProvider key={item.title}>
+          <Tooltip delayDuration={50}>
+            <TooltipTrigger asChild>{content}</TooltipTrigger>
+            <TooltipContent
+              side="right"
+              className="text-xs bg-popover border border-border text-popover-foreground shadow-xl px-3 py-1.5 font-medium"
+            >
+              {item.title}
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      );
+    }
 
-    return (
-      <Tooltip key={key ?? item.href}>
-        <TooltipTrigger asChild>{content}</TooltipTrigger>
-        <TooltipContent side="right" className="text-xs">
-          {item.title}
-        </TooltipContent>
-      </Tooltip>
-    );
+    return content;
   };
 
   return (
-    <TooltipProvider delayDuration={80}>
-      <aside
+    <div
+      className={cn(
+        "flex h-screen flex-col border-r border-border bg-background dark:bg-slate-950 text-foreground transition-all duration-300 ease-in-out select-none w-full",
+        className,
+      )}
+    >
+      {/* 🌟 HEADER AREA: Tombol Toggle Sekarang Selalu Ada di Sini */}
+      <div
         className={cn(
-          "relative flex flex-col border-r border-slate-800/80",
-          "bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.18)_0,_transparent_55%),_linear-gradient(to_bottom,_#020617,_#020617)]/95",
-          "backdrop-blur-2xl shadow-[0_24px_70px_rgba(0,0,0,0.9)]",
-          "transition-[width] duration-300",
-          collapsed ? "w-[80px]" : "w-[260px]",
-          className
+          "flex h-16 items-center px-4 justify-between border-b border-border/60 bg-background/40 backdrop-blur-sm",
+          collapsed && "flex-col justify-center py-2 h-24 gap-2 px-0",
         )}
       >
-        <div className="flex items-center justify-between px-4 pt-4 pb-3">
-          <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-violet-500 flex items-center justify-center shadow-[0_0_30px_rgba(139,92,246,0.6)]">
-              <Monitor className="h-5 w-5 text-white" />
-            </div>
-            {!collapsed && (
-              <div className="flex flex-col">
-                <span className="text-xs font-semibold tracking-tight text-slate-900 dark:text-slate-50">
-                  Aplikasi SIK
-                </span>
-                <span className="text-[10px] text-slate-400">
-                  Sistem Informasi
-                </span>
-              </div>
-            )}
+        {/* Area Logo / Icon Brand */}
+        <div
+          className={cn(
+            "flex items-center gap-2.5 min-w-0",
+            collapsed && "justify-center",
+          )}
+        >
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/20">
+            <Building2 className="h-4 w-4" />
           </div>
-
-          <button
-            onClick={onToggle}
-            className={cn(
-              "hidden md:inline-flex h-7 w-7 items-center justify-center rounded-full border border-slate-600/60",
-              "bg-slate-900/80 text-slate-300 hover:bg-slate-800 hover:text-slate-50 transition-all",
-              collapsed && "mx-auto"
-            )}
-            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          >
-            {collapsed ? (
-              <ChevronRight className="h-3 w-3" />
-            ) : (
-              <ChevronLeft className="h-3 w-3" />
-            )}
-          </button>
+          {!collapsed && (
+            <div className="flex flex-col min-w-0">
+              <span className="text-xs font-bold bg-gradient-to-r from-slate-800 to-slate-500 dark:from-slate-100 dark:to-slate-400 bg-clip-text text-transparent truncate tracking-wide">
+                PIONIR INOVASI
+              </span>
+              <span className="text-[10px] text-muted-foreground font-medium truncate tracking-tight">
+                Safety Portal K3
+              </span>
+            </div>
+          )}
         </div>
 
-        <div className="mx-3 mb-2 h-px bg-gradient-to-r from-transparent via-slate-600/60 to-transparent" />
+        {/* 🌟 TOMBOL TOGGLE YANG KONSISTEN: Selalu Terlihat Jelas di Atas Sidebar */}
+        <button
+          onClick={onToggle}
+          className={cn(
+            "flex h-6 w-6 items-center justify-center rounded-md border border-border bg-background hover:bg-muted text-muted-foreground transition-all active:scale-95 shadow-sm",
+            collapsed &&
+              "h-7 w-7 border-indigo-500/30 bg-indigo-500/5 text-indigo-500 hover:bg-indigo-500/10", // Kasih highlight pas kecil biar jelas bisa diklik
+          )}
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+        >
+          {collapsed ? (
+            <ChevronRight className="h-4 w-4 animate-pulse" /> // Panah Kanan (>) untuk Expand
+          ) : (
+            <ChevronLeft className="h-3.5 w-3.5" /> // Panah Kiri (<) untuk Hide
+          )}
+        </button>
+      </div>
 
-        <nav className="flex-1 px-2 pb-4 space-y-4 overflow-y-auto">
-          <div className="space-y-1">
+      {/* Navigation Groups */}
+      <nav className="flex-1 px-3 py-4 space-y-6 overflow-y-auto custom-scrollbar">
+        {navGroups.map((group, idx) => (
+          <div key={idx} className="space-y-1.5">
             {!collapsed && (
-              <p className="px-2 pb-1 text-[10px] font-semibold tracking-[0.14em] text-slate-500 uppercase">
-                Menu Utama
+              <p className="px-3 pb-1 text-[9px] font-bold tracking-[0.18em] text-slate-400 dark:text-slate-500 uppercase">
+                {group.groupTitle}
               </p>
             )}
-            {mainItems.map((item) => renderNavItem(item))}
+            {group.items.map((item) => renderNavItem(item))}
           </div>
-        </nav>
+        ))}
+      </nav>
 
-        <div className="px-4 py-3 border-t border-slate-800/80 text-[10px] text-slate-500 flex items-center justify-between">
-          {!collapsed && (
-            <span className="truncate">
-              © {new Date().getFullYear()}
-            </span>
-          )}
-          {collapsed && (
-            <span className="mx-auto text-[9px] tracking-wide">
-              © {new Date().getFullYear()}
-            </span>
-          )}
+      {/* Footer Area */}
+      {!collapsed && (
+        <div className="px-4 py-3 border-t border-border/60 text-[10px] text-muted-foreground flex items-center justify-between font-medium">
+          <span>v1.6.0</span>
+          <span>© {new Date().getFullYear()}</span>
         </div>
-      </aside>
-    </TooltipProvider>
+      )}
+    </div>
   );
 }
