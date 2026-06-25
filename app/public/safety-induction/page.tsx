@@ -64,11 +64,11 @@ function SafetyInductionContent() {
   const [data, setData] = useState<VerifyResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  
+
   const [currentPhase, setCurrentPhase] = useState<Phase>("welcome");
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  
+
   const [commitments, setCommitments] = useState<Record<number, boolean>>({});
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -275,10 +275,10 @@ function SafetyInductionContent() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-blue-950/20 text-slate-900 dark:text-slate-100 flex flex-col items-center py-6 px-4 md:py-12">
       <div className="max-w-2xl w-full bg-white dark:bg-slate-900/90 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/80 shadow-2xl rounded-3xl overflow-hidden flex flex-col h-[720px]">
-        
+
         {/* Phase-specific layout wrapper */}
         <AnimatePresence mode="wait">
-          
+
           {/* FASE 1: WELCOME SCREEN */}
           {currentPhase === "welcome" && (
             <motion.div
@@ -305,7 +305,7 @@ function SafetyInductionContent() {
                 <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white leading-tight mb-4 shrink-0">
                   Selamat Datang di Portal Keselamatan Kerja
                 </h1>
-                
+
                 <p className="text-sm md:text-base text-slate-500 dark:text-slate-400 max-w-md mb-8 leading-relaxed shrink-0">
                   Harap selesaikan modul induksi keselamatan dan kuis singkat untuk memverifikasi kelayakan bekerja Anda di lokasi proyek.
                 </p>
@@ -438,7 +438,7 @@ function SafetyInductionContent() {
                 >
                   <ArrowLeft className="w-4 h-4" /> Kembali
                 </button>
-                
+
                 <button
                   onClick={handleNextSlide}
                   className="flex-1 py-3 px-4 rounded-xl font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/15 transition flex items-center justify-center gap-1.5"
@@ -499,11 +499,10 @@ function SafetyInductionContent() {
                       <button
                         key={idx}
                         onClick={() => setAnswers((prev) => ({ ...prev, [currentQuestion.id]: choice }))}
-                        className={`flex flex-col text-left border rounded-2xl overflow-hidden transition-all duration-200 focus:outline-none ${
-                          isSelected
+                        className={`flex flex-col text-left border rounded-2xl overflow-hidden transition-all duration-200 focus:outline-none ${isSelected
                             ? "border-blue-500 bg-blue-50/40 dark:border-blue-500 dark:bg-blue-950/20 shadow-md shadow-blue-500/5 ring-1 ring-blue-500"
                             : "border-slate-200/70 dark:border-slate-800 hover:border-slate-350 dark:hover:border-slate-700 bg-white dark:bg-slate-900/40"
-                        }`}
+                          }`}
                       >
                         {/* Choice Image - Correct border class */}
                         {choiceImageUrl && (
@@ -523,14 +522,13 @@ function SafetyInductionContent() {
                         {/* Choice Text Area */}
                         <div className="p-4 flex items-start gap-3 flex-1">
                           {/* Custom Radio Button */}
-                          <div className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 mt-0.5 transition ${
-                            isSelected
+                          <div className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 mt-0.5 transition ${isSelected
                               ? "border-blue-600 bg-blue-600 text-white"
                               : "border-slate-300 dark:border-slate-700 text-transparent"
-                          }`}>
+                            }`}>
                             <Check className="w-3.5 h-3.5 stroke-[3]" />
                           </div>
-                          
+
                           <div className="flex flex-col">
                             {/* Fallback Letter Label if there is no image */}
                             {!choiceImageUrl && (
@@ -557,15 +555,14 @@ function SafetyInductionContent() {
                 >
                   <ArrowLeft className="w-4 h-4" /> Kembali
                 </button>
-                
+
                 <button
                   onClick={handleNextQuestion}
                   disabled={!answers[currentQuestion.id]}
-                  className={`flex-1 py-3.5 px-4 rounded-xl font-bold transition flex items-center justify-center gap-1.5 ${
-                    answers[currentQuestion.id]
+                  className={`flex-1 py-3.5 px-4 rounded-xl font-bold transition flex items-center justify-center gap-1.5 ${answers[currentQuestion.id]
                       ? "bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/15"
                       : "bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-600 cursor-not-allowed"
-                  }`}
+                    }`}
                 >
                   {currentQuestionIndex < quizQuestions.length - 1 ? (
                     <>Lanjut <ArrowRight className="w-4 h-4" /></>
@@ -773,7 +770,7 @@ function SafetyInductionContent() {
                 >
                   Tinjau Jawaban
                 </button>
-                
+
                 <button
                   onClick={handleSubmit}
                   className="flex-1 py-3 px-4 rounded-xl font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/15 transition flex items-center justify-center gap-2 animate-pulse"
